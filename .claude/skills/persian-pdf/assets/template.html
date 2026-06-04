@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>سند</title>
+<style>
+  /* Paste base64 from /tmp/vazir_reg_b64.txt and /tmp/vazir_bold_b64.txt here.
+     Replace REG_BASE64 / BOLD_BASE64 with the actual strings (no quotes). */
+  @font-face{font-family:'Vazirmatn';font-weight:400;
+    src:url(data:font/ttf;base64,REG_BASE64) format('truetype');}
+  @font-face{font-family:'Vazirmatn';font-weight:800;
+    src:url(data:font/ttf;base64,BOLD_BASE64) format('truetype');}
+
+  :root{
+    --ink:#16202e; --slate:#33415c; --muted:#5f6b7a; --line:#e4e9f0;
+    --brand:#123a5e; --brand2:#1f6f8b; --ok:#15784e; --gold:#c98a16;
+    --soft:#f5f8fb;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{font-family:'Vazirmatn',Tahoma,sans-serif;color:var(--ink);
+    line-height:1.85;font-size:13px;background:#e9edf2;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+  /* one A4 sheet; repeat .page for multi-page docs */
+  .page{width:210mm;min-height:297mm;background:#fff;margin:0 auto;
+    position:relative;overflow:hidden;padding:16mm 15mm;}
+  .page + .page{margin-top:8px;}
+  .edge{position:absolute;top:0;bottom:0;right:0;width:6mm;
+    background:linear-gradient(180deg,var(--brand),var(--brand2));}
+
+  h1{font-size:22px;font-weight:800;color:var(--brand);margin:0;}
+  .h-sec{font-size:16px;font-weight:800;color:var(--brand);margin:14px 0 6px;
+    display:flex;align-items:center;gap:9px;}
+  .h-sec .bar{width:6px;height:20px;background:var(--brand2);border-radius:3px;}
+  p{margin:0 0 8px;color:var(--slate);text-align:justify;}
+
+  table{width:100%;border-collapse:collapse;margin:8px 0;font-size:12px;}
+  thead th{background:var(--brand);color:#fff;padding:9px 11px;font-weight:700;text-align:right;}
+  tbody td{padding:9px 11px;border-bottom:1px solid var(--line);color:var(--slate);}
+  tbody tr:nth-child(even){background:#f8fafc;}
+
+  .callout{background:var(--soft);border:1px solid var(--line);
+    border-right:4px solid var(--brand2);border-radius:11px;padding:11px 15px;margin:10px 0;}
+
+  @page{size:A4;margin:0;}
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="edge"></div>
+    <h1>عنوان سند</h1>
+    <p>متن نمونه — این یک قالب پایه است. فونت را به‌صورت base64 جای‌گذاری کنید،
+       محتوای فارسی را با ارقام فارسی (۰۱۲۳۴۵۶۷۸۹) بنویسید، و برای اسناد چندصفحه‌ای
+       بلوک <code>.page</code> را تکرار کنید.</p>
+  </div>
+</body>
+</html>
