@@ -10,15 +10,21 @@ fonts are embedded as base64 in the HTML, so no network is needed at render time
 """
 import os
 import sys
+import glob
 import shutil
 import subprocess
 
-# Common locations, in priority order. Playwright's bundled Chromium first.
+# Common locations, in priority order. Playwright's bundled Chromium first,
+# then typical Windows install paths.
 CANDIDATES = [
     "/opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+    r"C:\devin\chrome\chrome-win64\chrome.exe",
+    r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe"),
 ]
 PATH_NAMES = ["chromium", "chromium-browser", "google-chrome",
-              "google-chrome-stable", "chrome"]
+              "google-chrome-stable", "chrome", "chrome.exe"]
 
 
 def find_chromium():
@@ -26,7 +32,7 @@ def find_chromium():
     for c in CANDIDATES:
         if os.path.isfile(c) and os.access(c, os.X_OK):
             return c
-    # any chromium under /opt/pw-browsers
+    # any chromium under /opt/pw-browsers (Linux)
     pw = "/opt/pw-browsers"
     if os.path.isdir(pw):
         for root, _dirs, files in os.walk(pw):
@@ -39,6 +45,14 @@ def find_chromium():
         p = shutil.which(name)
         if p:
             return p
+    # bundled Chromium installed by `npx puppeteer browsers install chrome`
+    for pat in (
+        os.path.expanduser("~/.cache/puppeteer/chrome/*/chrome-*/chrome"),
+        os.path.expandvars(r"%USERPROFILE%\.cache\puppeteer\chrome\*\chrome-*\chrome.exe"),
+    ):
+        hits = sorted(glob.glob(pat))
+        if hits:
+            return hits[-1]
     return None
 
 
