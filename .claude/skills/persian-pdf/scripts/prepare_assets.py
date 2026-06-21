@@ -1,29 +1,53 @@
 #!/usr/bin/env python3
 """Ensure the Vazirmatn Persian font is available and emit its base64.
 
-- Downloads Vazirmatn Regular + Bold TTFs to /tmp if missing (GitHub raw, which
-  is reachable in this environment; the jsdelivr CDN is usually blocked).
-- Writes base64 to /tmp/vazir_reg_b64.txt and /tmp/vazir_bold_b64.txt.
+- Downloads Vazirmatn Regular + Bold TTFs to a temp dir if missing (GitHub raw,
+  which is reachable in most environments; the jsdelivr CDN is usually blocked).
+- Writes base64 next to the TTFs (vazir_reg_b64.txt / vazir_bold_b64.txt).
 - Validates the files are real TrueType (guards against an HTML error page being
   saved as a .ttf).
 
-Run with the Bash tool using dangerouslyDisableSandbox: true (network needed).
+Cross-platform: the output directory is the system temp dir (Linux: /tmp,
+Windows: %TEMP%). TLS verification uses certifi's CA bundle when available so
+the download works on machines whose default trust store can't verify GitHub
+(common on Windows).
+
+Run with network access available.
 """
 import base64
 import os
+import ssl
 import sys
+import tempfile
 import urllib.request
 
 VER = "v33.003"
 BASE = f"https://raw.githubusercontent.com/rastikerdar/vazirmatn/{VER}/fonts/ttf"
+TMP = tempfile.gettempdir()
 FONTS = {
-    "Regular": "/tmp/Vazirmatn-Regular.ttf",
-    "Bold": "/tmp/Vazirmatn-Bold.ttf",
+    "Regular": os.path.join(TMP, "Vazirmatn-Regular.ttf"),
+    "Bold": os.path.join(TMP, "Vazirmatn-Bold.ttf"),
 }
 B64 = {
-    "Regular": "/tmp/vazir_reg_b64.txt",
-    "Bold": "/tmp/vazir_bold_b64.txt",
+    "Regular": os.path.join(TMP, "vazir_reg_b64.txt"),
+    "Bold": os.path.join(TMP, "vazir_bold_b64.txt"),
 }
+
+
+def make_ssl_context():
+    """Prefer certifi's CA bundle; fall back to the system default."""
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:  # noqa
+        return ssl.create_default_context()
+
+
+def download(url, path, ctx):
+    with urllib.request.urlopen(url, context=ctx) as resp:
+        data = resp.read()
+    with open(path, "wb") as f:
+        f.write(data)
 
 
 def valid_ttf(path):
@@ -36,12 +60,13 @@ def valid_ttf(path):
 
 
 def main():
+    ctx = make_ssl_context()
     for weight, path in FONTS.items():
         if not valid_ttf(path):
             url = f"{BASE}/Vazirmatn-{weight}.ttf"
             print(f"downloading {weight} from {url}")
             try:
-                urllib.request.urlretrieve(url, path)
+                download(url, path, ctx)
             except Exception as e:  # noqa
                 print(f"ERROR downloading {weight}: {e}")
                 sys.exit(1)

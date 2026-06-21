@@ -29,9 +29,12 @@ This method avoids all of that:
    ```bash
    python3 .claude/skills/persian-pdf/scripts/prepare_assets.py
    ```
-   This ensures the Vazirmatn TTFs exist at `/tmp/Vazirmatn-{Regular,Bold}.ttf`
-   (downloading from GitHub raw if missing) and prints their base64 to
-   `/tmp/vazir_reg_b64.txt` and `/tmp/vazir_bold_b64.txt`.
+   This ensures the Vazirmatn TTFs exist in the system temp dir
+   (`/tmp` on Linux/macOS, `%TEMP%` on Windows) — downloading from GitHub raw
+   if missing — and writes their base64 to `vazir_reg_b64.txt` and
+   `vazir_bold_b64.txt` in that same temp dir. The script prints the exact
+   paths it wrote. TLS uses certifi's CA bundle so the download also works on
+   Windows.
 
    For an image (e.g. a profile photo cropped from a screenshot), use Pillow to
    crop/resize then base64-encode it — embed with `src="data:image/jpeg;base64,..."`.
